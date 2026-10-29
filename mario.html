@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jogo do Mário</title><style>
+*{box-sizing:border-box}body{margin:0;background:#101010;color:#fff;font-family:Arial,sans-serif;text-align:center}
+header{padding:12px;display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap}
+a,button{border:0;border-radius:10px;padding:10px 16px;background:#f1dc88;color:#222;font-weight:bold;text-decoration:none;cursor:pointer}
+#frame{width:min(100vw,800px);margin:auto}canvas{width:100%;height:auto;display:block;aspect-ratio:4/3;touch-action:none}
+p{padding:0 12px;color:#ddd;font-size:14px}
+.controls{display:none;gap:8px;justify-content:center;padding:10px}.controls button{min-width:54px}
+@media(max-width:700px){.controls{display:flex}}
+</style></head><body><header><a href="index.html">← Voltar ao menu</a><strong>🍄 Jogo do Mário</strong><button id="sound">🔊 Som</button></header>
+<div id="frame"><canvas id="game" width="800" height="600"></canvas></div>
+<div class="controls"><button data-k="ArrowLeft">←</button><button data-k="ArrowUp">↑</button><button data-k="ArrowDown">↓</button><button data-k="ArrowRight">→</button></div>
+<p>Use as setas do teclado para mover o Mario. No celular, use os botões.</p>
+<audio id="music" src="somdefundo-mario.mp3" loop></audio><audio id="jump" src="pulo-mario.ogg"></audio><audio id="step" src="passo.ogg"></audio>
+<script>
+const c=document.getElementById('game'),ctx=c.getContext('2d'),music=document.getElementById('music'),jump=document.getElementById('jump'),step=document.getElementById('step');
+const bg=new Image(),player=new Image();bg.src='cenario-mario.jpg';player.src='mario.png';
+let x=240,y=270,speed=3,keys={},audioStarted=false,muted=false;
+function startAudio(){if(!audioStarted&&!muted){music.volume=.5;music.play().catch(()=>{});audioStarted=true}}
+document.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();startAudio();if(!keys[e.key]){if(e.key==='ArrowUp'&&!muted){jump.currentTime=0;jump.play().catch(()=>{})}else if(!muted){step.currentTime=0;step.play().catch(()=>{})}}keys[e.key]=true}});
+document.addEventListener('keyup',e=>{keys[e.key]=false});
+document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;const down=e=>{e.preventDefault();startAudio();keys[k]=true};const up=e=>{e.preventDefault();keys[k]=false};b.addEventListener('pointerdown',down);b.addEventListener('pointerup',up);b.addEventListener('pointerleave',up);b.addEventListener('pointercancel',up)});
+document.getElementById('sound').onclick=()=>{muted=!muted;if(muted){music.pause();jump.muted=step.muted=true;document.getElementById('sound').textContent='🔇 Som'}else{jump.muted=step.muted=false;music.play().catch(()=>{});document.getElementById('sound').textContent='🔊 Som'}};
+function draw(){if(keys.ArrowLeft)x-=speed;if(keys.ArrowRight)x+=speed;if(keys.ArrowUp)y-=speed;if(keys.ArrowDown)y+=speed;x=Math.max(0,Math.min(800-60,x));y=Math.max(0,Math.min(600-80,y));
+if(bg.complete&&bg.naturalWidth)ctx.drawImage(bg,0,0,800,600);else{ctx.fillStyle='#164bff';ctx.fillRect(0,0,800,600)}
+if(player.complete&&player.naturalWidth)ctx.drawImage(player,x,y,60,80);requestAnimationFrame(draw)}
+requestAnimationFrame(draw);
+</script></body></html>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menu Principal</title>
+<style>
+*{box-sizing:border-box} body{margin:0;font-family:Arial,sans-serif;background:#0b1025;color:#fff}
+main{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(#07112a55,#07112a88),url('fundo_menu.jpg') center/cover fixed}
+.panel{width:min(820px,100%);padding:28px 24px 22px;border-radius:24px;background:#11172bcc;border:1px solid #fff5;box-shadow:0 18px 55px #0008;text-align:center;backdrop-filter:blur(3px)}
+h1{font-size:clamp(32px,5vw,54px);margin:8px 0 28px;color:#fff1bf;text-shadow:3px 4px #000}
+.buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;max-width:620px;margin:auto}
+button,.gamebtn{border:2px solid #fff;border-radius:100px;padding:18px 12px;background:#fae696;color:#2d2512;font-weight:700;font-size:clamp(17px,2.4vw,22px);cursor:pointer;text-decoration:none;transition:.15s;display:block}
+button:hover,.gamebtn:hover{transform:translateY(-3px);background:#fff8ce;box-shadow:0 7px 0 #0005}
+#options{display:none;margin-top:22px;padding:18px;background:#0005;border-radius:16px}
+footer{margin-top:26px;color:#f0eddb;font-size:14px}
+@media(max-width:520px){.buttons{grid-template-columns:1fr}.panel{padding:24px 16px}}
+</style></head>
+<body><main><section class="panel">
+<h1>Menu Principal</h1>
+<div class="buttons">
+<a class="gamebtn" href="fps.html">🎯 Jogo FPS</a>
+<a class="gamebtn" href="mario.html">🍄 Jogo do Mário</a>
+<button id="optionsBtn">⚙️ Opções</button>
+<button id="soundBtn">🔊 Música: ligada</button>
+</div>
+<div id="options"><strong>OPÇÕES</strong><p>Use o mouse para jogar o FPS e as setas do teclado para mover o Mario.</p><p>Para voltar ao menu, use o botão “Voltar ao menu” em cada jogo.</p></div>
+<footer>Use o mouse para navegar · Divirta-se!</footer>
+</section></main>
+<audio id="music" src="musica_menu.mp3" loop></audio>
+<script>
+const music=document.getElementById('music'); let musicStarted=false;
+function startMusic(){if(!musicStarted){music.play().then(()=>{musicStarted=true}).catch(()=>{});}}
+document.addEventListener('pointerdown',startMusic,{once:true});
+document.getElementById('optionsBtn').addEventListener('click',()=>{const o=document.getElementById('options');o.style.display=o.style.display==='block'?'none':'block';startMusic()});
+document.getElementById('soundBtn').addEventListener('click',()=>{if(music.paused){music.play().catch(()=>{});document.getElementById('soundBtn').textContent='🔊 Música: ligada'}else{music.pause();document.getElementById('soundBtn').textContent='🔇 Música: desligada'}});
+</script></body></html>

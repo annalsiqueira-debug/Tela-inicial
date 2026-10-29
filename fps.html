@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teste sua mira</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#111;color:white;font-family:Arial,sans-serif;text-align:center}
+header{padding:12px;display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}
+a,button{border:0;border-radius:10px;padding:10px 16px;background:#f1dc88;color:#222;font-weight:bold;text-decoration:none;cursor:pointer}
+#wrap{width:min(100vw,1280px);margin:auto;position:relative}
+canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;cursor:none;background:#1648ff}
+.tip{font-size:14px;color:#ddd;padding:8px}
+</style></head><body>
+<header><a href="index.html">← Voltar ao menu</a><strong>🎯 Teste sua mira</strong><button id="soundToggle">🔊 Som</button><button id="restart">Reiniciar (R)</button></header>
+<div id="wrap"><canvas id="game" width="1280" height="720" aria-label="Jogo Teste sua mira"></canvas></div>
+<div class="tip">Mova a mira com o mouse e clique no cogumelo 20 vezes. Pressione R para reiniciar.</div>
+<audio id="music" src="somdefundo-mario.mp3" loop></audio><audio id="shot" src="som_tiro.mp3"></audio>
+<script>
+const c=document.getElementById('game'),ctx=c.getContext('2d'),music=document.getElementById('music'),shot=document.getElementById('shot');
+const bg=new Image(),mush=new Image(),aim=new Image();bg.src='cenario-mario.jpg';mush.src='cogumelo.png';aim.src='mira.png';
+let x=20,y=100,dir=1,speed=10,hits=20,mouse={x:640,y:360},started=false,muted=false,won=false,last=0;
+function startAudio(){if(!started&&!muted){music.volume=.3;music.play().catch(()=>{});started=true}}
+function reset(){hits=20;won=false;x=20;y=50+Math.random()*570;dir=1;speed=8+Math.random()*17}
+document.getElementById('restart').onclick=reset;
+document.getElementById('soundToggle').onclick=()=>{muted=!muted;if(muted){music.pause();shot.muted=true;document.getElementById('soundToggle').textContent='🔇 Som'}else{shot.muted=false;music.play().catch(()=>{});document.getElementById('soundToggle').textContent='🔊 Som'}};
+c.addEventListener('pointermove',e=>{const r=c.getBoundingClientRect();mouse.x=(e.clientX-r.left)*c.width/r.width;mouse.y=(e.clientY-r.top)*c.height/r.height});
+c.addEventListener('pointerdown',e=>{startAudio();if(hits<=0)return;const r=c.getBoundingClientRect(),mx=(e.clientX-r.left)*c.width/r.width,my=(e.clientY-r.top)*c.height/r.height;if(mx>=x&&mx<=x+80&&my>=y&&my<=y+80){hits--;if(hits===0)won=true;}if(!muted){shot.currentTime=0;shot.play().catch(()=>{})}});
+document.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='r')reset()});
+function draw(t){let dt=Math.min((t-last)/16.67||1,2);last=t;if(hits>0){x+=dir*speed*dt;if(x>1280||x< -80){dir=Math.random()<.5?1:-1;speed=8+Math.random()*17;x=dir===1?-80:1280;y=45+Math.random()*580}}
+ctx.clearRect(0,0,1280,720);if(bg.complete&&bg.naturalWidth)ctx.drawImage(bg,0,0,1280,720);else{ctx.fillStyle='#154bff';ctx.fillRect(0,0,1280,720)}
+if(mush.complete&&mush.naturalWidth)ctx.drawImage(mush,x,y,80,80);
+ctx.fillStyle='#000';ctx.fillRect(465,10,350,45);ctx.fillStyle='#fff';ctx.fillRect(470,15,340,35);ctx.fillStyle='#e22';ctx.fillRect(470,15,340*hits/20,35);
+ctx.fillStyle='#e33';ctx.fillRect(1170,10,100,42);ctx.fillStyle='#fff';ctx.font='bold 26px Arial';ctx.fillText('SAIR',1187,39);
+if(mouse.x>1170&&mouse.x<1270&&mouse.y<52){} // botão sair é controlado abaixo
+if(aim.complete&&aim.naturalWidth)ctx.drawImage(aim,mouse.x-20,mouse.y-20,40,40);else{ctx.strokeStyle='white';ctx.beginPath();ctx.arc(mouse.x,mouse.y,14,0,Math.PI*2);ctx.stroke()}
+if(won){ctx.fillStyle='#fff';ctx.strokeStyle='#111';ctx.lineWidth=5;ctx.font='bold 72px Arial';ctx.strokeText('Você venceu!',460,350);ctx.fillText('Você venceu!',460,350);ctx.font='bold 36px Arial';ctx.fillText('Aperte R para jogar novamente',390,410)}
+requestAnimationFrame(draw)}
+c.addEventListener('click',e=>{const r=c.getBoundingClientRect(),mx=(e.clientX-r.left)*c.width/r.width,my=(e.clientY-r.top)*c.height/r.height;if(mx>=1170&&my<=52){location.href='index.html'}});
+requestAnimationFrame(draw);
+</script></body></html>
